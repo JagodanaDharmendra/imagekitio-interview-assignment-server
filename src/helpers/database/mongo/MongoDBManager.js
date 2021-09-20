@@ -58,16 +58,24 @@ class MongoDBManager {
       src: src,
     };
     await FileCollection.CreateFile(data);
-    return await FolderCollection.AddFileIdInArray({
+    await FolderCollection.AddFileIdInArray({
       db: data.db,
       parentFolderId: data.folderId,
       fileId: data.fileId,
     });
+
+    return await FolderCollection.RecountFolderSize({
+      db: MongoDBManager.DB,
+      folderId: parentFolderId,
+      sizeDifference: size,
+    });
   }
 
-  static async GetAllFileInReverseOrder() {
-    const result = await FileCollection.GetAllFileInReverseOrder({
+  static async GetAllFileInOrder({ folderId, reverse }) {
+    const result = await FileCollection.GetAllFileInOrder({
       db: MongoDBManager.DB,
+      folderId,
+      reverse,
     });
     return result;
   }
@@ -78,36 +86,68 @@ class MongoDBManager {
   }
 
   static async DeleteFolder({ folderId }) {
-    let result = await FolderCollection.GetChildFolders({
+    let folderData = (await this.GetFolderData({ folderId })).data;
+    // console.log(folderData);
+
+    await FolderCollection.DeleteFoldersDataFromArray({
       db: MongoDBManager.DB,
-      folderId: folderId,
+      parentFolderId: folderData.parentFolderId,
+      folderId,
     });
-    if (result.success) {
-      const mFoldersList = result.data;
-      result = await FolderCollection.DeleteFolders({
+
+    let mFoldersList = (
+      await FolderCollection.GetChildFolders({
         db: MongoDBManager.DB,
-        folders: mFoldersList,
-      });
-      result = await FileCollection.DeleteFilesByFolders({
+        folderId: folderId,
+      })
+    ).data;
+
+    await FolderCollection.DeleteFolders({
+      db: MongoDBManager.DB,
+      folders: mFoldersList,
+    });
+
+    await FileCollection.DeleteFilesByFolders({
+      db: MongoDBManager.DB,
+      folders: mFoldersList,
+    });
+
+    return await FolderCollection.RecountFolderSize({
+      db: MongoDBManager.DB,
+      folderId: folderData.parentFolderId,
+      sizeDifference: -folderData.size,
+    });
+  }
+
+  static async DeleteFile({ fileId }) {
+    let fileData = (await this.GetFileData({ fileId })).data;
+    if (fileData) {
+      await FolderCollection.DeleteFilesDataFromArray({
         db: MongoDBManager.DB,
-        folders: mFoldersList,
+        folderId: fileData.folderId,
+        fileId,
       });
-      return result;
+
+      await FileCollection.DeleteFileById({
+        db: MongoDBManager.DB,
+        fileId,
+      });
+
+      return await FolderCollection.RecountFolderSize({
+        db: MongoDBManager.DB,
+        folderId: fileData.folderId,
+        sizeDifference: -fileData.size,
+      });
     } else {
-      return result;
+      return {
+        success: false,
+        error: "No Data Found to delete",
+      };
     }
   }
 
-  static async SearchByFileName({ fileName }) {
-    const result = await FileCollection.SearchByFileName({
-      db: MongoDBManager.DB,
-      fileName,
-    });
-    return result;
-  }
-
-  static async SearchByFileNameAndType({ fileName, fileType }) {
-    const result = await FileCollection.SearchByFileNameAndType({
+  static async SearchFile({ fileName, fileType }) {
+    const result = await FileCollection.SearchFile({
       db: MongoDBManager.DB,
       fileName,
       fileType,
@@ -134,6 +174,22 @@ class MongoDBManager {
   static async DeleteAllFiles() {
     const result = await FileCollection.DeleteAllFiles({
       db: MongoDBManager.DB,
+    });
+    return result;
+  }
+
+  static async GetFolderData({ folderId }) {
+    const result = await FolderCollection.GetFolderDataById({
+      db: MongoDBManager.DB,
+      folderId: folderId,
+    });
+    return result;
+  }
+
+  static async GetFileData({ fileId }) {
+    const result = await FileCollection.GetFileData({
+      db: MongoDBManager.DB,
+      fileId,
     });
     return result;
   }

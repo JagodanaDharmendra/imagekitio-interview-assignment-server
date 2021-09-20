@@ -73,13 +73,19 @@ class FileCollection {
     }
   }
 
-  static async GetAllFileInReverseOrder({ db }) {
+  static async GetAllFileInOrder({ db, folderId, reverse }) {
     try {
       if (db) {
+        const queryObj = folderId == null ? {} : { folderId: folderId };
+        const sortObj = { date: reverse ? -1 : 1 };
+
+        console.log(JSON.stringify(queryObj));
+        console.log(JSON.stringify(sortObj));
+
         const result = await db
           .collection(FileCollection.COLLECTION_NAME)
-          .find({})
-          .sort({ date: -1 })
+          .find(queryObj)
+          .sort(sortObj)
           .toArray();
         return {
           error: false,
@@ -129,13 +135,21 @@ class FileCollection {
     }
   }
 
-  static async SearchByFileName({ db, fileName }) {
+  static async SearchFile({ db, fileName, fileType }) {
     try {
       if (db) {
+        const nameQuery = {
+          name: { $regex: fileName != null ? fileName : "//" },
+        };
+
+        const typeQuery = {
+          type: { $regex: fileType != null ? fileType : "//" },
+        };
+
         const result = await db
           .collection(FileCollection.COLLECTION_NAME)
           .find({
-            $name: { $search: fileName },
+            $and: [nameQuery, typeQuery],
           })
           .toArray();
         return {
@@ -158,18 +172,38 @@ class FileCollection {
     }
   }
 
-  static async SearchByFileNameAndType({ db, fileName, fileType }) {
+  static async GetFileData({ db, fileId }) {
     try {
       if (db) {
         const result = await db
           .collection(FileCollection.COLLECTION_NAME)
-          .find({
-            $and: [
-              { $name: { $search: fileName } },
-              { $type: { $eq: fileType } },
-            ],
-          })
-          .toArray();
+          .findOne({ fileId: fileId });
+        return {
+          error: false,
+          success: true,
+          data: result,
+        };
+      } else {
+        return {
+          error: "Database connection lost",
+          success: false,
+        };
+      }
+    } catch (e) {
+      console.log(e);
+      return {
+        error: e,
+        success: false,
+      };
+    }
+  }
+
+  static async DeleteFileById({ db, fileId }) {
+    try {
+      if (db) {
+        const result = await db
+          .collection(FileCollection.COLLECTION_NAME)
+          .deleteOne({ fileId: fileId });
         return {
           error: false,
           success: true,

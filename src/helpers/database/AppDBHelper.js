@@ -17,8 +17,10 @@ class AppDBHelper {
       //create dummy folders
       let currentId = 0;
       for (let iPos = 0; iPos < totalToGenerate; iPos++) {
-        const randomNumber = Math.random();
-        const random = Math.floor(randomNumber * (currentId + 1));
+        let random;
+        do {
+          random = Math.floor(Math.random() * (currentId + 1));
+        } while (iPos != 0 && random === iPos);
         const obj = {
           name: `Folder_${currentId}`,
           path: `Folder_${currentId}`,
@@ -76,7 +78,7 @@ class AppDBHelper {
         " " +
         size +
         " " +
-        dim +
+        dim.toString() +
         " " +
         type +
         " " +
@@ -101,16 +103,15 @@ class AppDBHelper {
 
     return result;
   }
-
-  static async GetAllFileInReverseOrder() {
-    console.log("GetAllFileInReverseOrder ");
+  static async GetAllFileInOrder({ folderId, reverse }) {
+    console.log("GetAllFileInOrder ");
     //get all files record from databases in reverse order by added date
 
     let result = null;
 
     {
       //mongoDB
-      result = await MongoDBManager.GetAllFileInReverseOrder();
+      result = await MongoDBManager.GetAllFileInOrder({ folderId, reverse });
     }
 
     return result;
@@ -141,27 +142,27 @@ class AppDBHelper {
     return result;
   }
 
-  static async SearchByFileName({ fileName }) {
-    console.log("SearchByFileName " + fileName);
+  static async DeleteFile({ fileId }) {
+    console.log("DeleteFile " + fileId);
 
     let result = null;
 
     {
       //mongoDB
-      result = await MongoDBManager.SearchByFileName({ fileName });
+      result = await MongoDBManager.DeleteFile({ fileId });
     }
 
     return result;
   }
 
-  static async SearchByFileNameAndType({ fileName, fileType }) {
-    console.log("SearchByFileNameAndType " + fileName + " " + fileType);
+  static async SearchFile({ fileName, fileType }) {
+    console.log("SearchFile " + fileName + " " + fileType);
 
     let result = null;
 
     {
       //mongoDB
-      result = await MongoDBManager.SearchByFileNameAndType({
+      result = await MongoDBManager.SearchFile({
         fileName,
         fileType,
       });
@@ -204,6 +205,23 @@ class AppDBHelper {
     {
       //mongoDB
       result = await MongoDBManager.DeleteAllFiles();
+    }
+
+    return result;
+  }
+
+  static async GetRootFolderData() {
+    return await AppDBHelper.GetFolderData({ folderId: "Folder_0" });
+  }
+
+  static async GetFolderData({ folderId }) {
+    console.log("GetFolderData " + folderId);
+
+    let result = null;
+
+    {
+      //mongoDB
+      result = await MongoDBManager.GetFolderData({ folderId });
     }
 
     return result;
