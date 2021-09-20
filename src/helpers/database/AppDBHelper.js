@@ -24,7 +24,7 @@ class AppDBHelper {
         const obj = {
           name: `Folder_${currentId}`,
           path: `Folder_${currentId}`,
-          parentFolderId: `Folder_${random}`,
+          parentFolderId: currentId == 0 ? "root" : `Folder_${random}`,
         };
         await this.CreateFolder(obj);
         currentId++;
