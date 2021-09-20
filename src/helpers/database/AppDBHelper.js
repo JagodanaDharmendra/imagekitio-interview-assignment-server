@@ -211,7 +211,7 @@ class AppDBHelper {
   }
 
   static async GetRootFolderData() {
-    return await AppDBHelper.GetFolderData({ folderId: "root" });
+    return await AppDBHelper.GetFolderData({ folderId: "Folder_0" });
   }
 
   static async GetFolderData({ folderId }) {
