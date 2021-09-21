@@ -1,0 +1,52 @@
+### A
+
+///Remove URL for live if not in development mode
+
+### Get Root Folder Data
+GET http://localhost:3000/folders HTTP/1.1
+
+
+### Get All Folder Data
+GET http://localhost:3000/folders/all HTTP/1.1
+
+
+### Create Folder at Any Level (In "Folder_0" folder to so on...)
+POST http://localhost:3000/folders/create HTTP/1.1
+content-type: application/json
+
+{
+   "name": "Folder_0001",
+   "path" :"Folder_000...",
+   "parentFolderId"  : "Folder_1"
+}
+
+
+### Delete Folder By folderId
+POST http://localhost:3000/folders/delete HTTP/1.1
+content-type: application/json
+
+{
+   "folderId": "Folder_0"
+}
+
+
+### Get Data for Folder by folderId
+GET http://localhost:3000/folders/data/Folder_1 HTTP/1.1
+
+
+### Rename Folder by folderId
+POST http://localhost:3000/folders/rename HTTP/1.1
+content-type: application/json
+
+{
+   "folderId": "Folder_1",
+   "newName": "newFolder1"
+}
+
+### Get Folder total Size By folderId
+GET http://localhost:3000/folders/size HTTP/1.1
+content-type: application/json
+
+{
+   "folderId": "Folder_10"
+}

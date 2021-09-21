@@ -1,0 +1,69 @@
+### A
+
+///Remove URL for live, if not in development mode
+
+### Get All Files Data
+GET http://localhost:3000/files HTTP/1.1
+content-type: application/json
+
+{
+    "folderId": null,
+    "reverse"  : false
+}
+
+### Get All Files Data in reverse order
+GET http://localhost:3000/files HTTP/1.1
+content-type: application/json
+
+{
+    "folderId": null,
+    "reverse"  : true
+}
+
+### Get All Files Data in order(normal or reverse) in given folder
+GET http://localhost:3000/files HTTP/1.1
+content-type: application/json
+
+{
+    "folderId": "Folder_1",
+    "reverse"  : true
+}
+
+### Search By fileName or fileType
+//fileName IN => "File_001" , "File_0" , "File"
+//fileType IN => JPEG, TIFF, PNG, MOV
+
+GET http://localhost:3000/files/search HTTP/1.1
+content-type: application/json
+
+{
+    "fileName" : "File_2",
+    "fileType": "JPG"
+}
+
+### Delete File By fileId
+
+POST http://localhost:3000/files/delete HTTP/1.1
+content-type: application/json
+
+{
+    "fileId" : "File_0"
+}
+
+### Create File
+
+POST http://localhost:3000/files/create HTTP/1.1
+content-type: application/json
+
+{
+    "name": "File_new_001",
+    "size": 100,
+    "dim": 
+    { 
+        "h": 0,
+        "w": 0 
+    },
+    "type": "JPG",
+    "src": "URL",
+    "parentFolderId": "Folder_0"
+}
