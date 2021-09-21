@@ -117,6 +117,20 @@ class AppDBHelper {
     return result;
   }
 
+  static async GetAllFolderData() {
+    console.log("GetAllFolderData ");
+    //get all files record from databases in reverse order by added date
+
+    let result = null;
+
+    {
+      //mongoDB
+      result = await MongoDBManager.GetAllFolderData();
+    }
+
+    return result;
+  }
+
   static async GetTotalSizeOfFolder({ folderId }) {
     console.log("GetTotalSizeOfFolder " + folderId);
     let result = null;

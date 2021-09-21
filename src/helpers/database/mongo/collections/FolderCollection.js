@@ -43,6 +43,33 @@ class FolderCollection {
     }
   }
 
+  static async GetAllFolderData({ db }) {
+    try {
+      if (db) {
+        const result = await db
+          .collection(this.COLLECTION_NAME)
+          .find()
+          .toArray();
+        return {
+          error: false,
+          success: true,
+          data: result,
+        };
+      } else {
+        return {
+          error: "Database connection lost",
+          success: false,
+        };
+      }
+    } catch (e) {
+      console.log(e);
+      return {
+        error: e,
+        success: false,
+      };
+    }
+  }
+
   static async GetFolderDataById({ db, folderId }) {
     try {
       if (db) {
@@ -73,7 +100,7 @@ class FolderCollection {
     const result = await this.GetFolderDataById({ db, folderId });
     if (result && result.success) {
       return {
-        success: true,
+        success: result.data?.size != null,
         data: result.data?.size ?? 0,
       };
     }

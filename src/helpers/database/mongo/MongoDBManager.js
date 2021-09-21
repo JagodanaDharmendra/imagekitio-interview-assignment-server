@@ -80,43 +80,59 @@ class MongoDBManager {
     return result;
   }
 
+  static async GetAllFolderData() {
+    const result = await FolderCollection.GetAllFolderData({
+      db: MongoDBManager.DB,
+    });
+    return result;
+  }
+
   static async GetTotalSizeOfFolder({ folderId }) {
-    const result = await FolderCollection.GetTotalSizeOfFolder(folderId);
+    const result = await FolderCollection.GetTotalSizeOfFolder({
+      db: MongoDBManager.DB,
+      folderId,
+    });
     return result;
   }
 
   static async DeleteFolder({ folderId }) {
     let folderData = (await this.GetFolderData({ folderId })).data;
     // console.log(folderData);
-
-    await FolderCollection.DeleteFoldersDataFromArray({
-      db: MongoDBManager.DB,
-      parentFolderId: folderData.parentFolderId,
-      folderId,
-    });
-
-    let mFoldersList = (
-      await FolderCollection.GetChildFolders({
+    if (folderData) {
+      await FolderCollection.DeleteFoldersDataFromArray({
         db: MongoDBManager.DB,
-        folderId: folderId,
-      })
-    ).data;
+        parentFolderId: folderData.parentFolderId,
+        folderId,
+      });
 
-    await FolderCollection.DeleteFolders({
-      db: MongoDBManager.DB,
-      folders: mFoldersList,
-    });
+      let mFoldersList = (
+        await FolderCollection.GetChildFolders({
+          db: MongoDBManager.DB,
+          folderId: folderId,
+        })
+      ).data;
 
-    await FileCollection.DeleteFilesByFolders({
-      db: MongoDBManager.DB,
-      folders: mFoldersList,
-    });
+      await FolderCollection.DeleteFolders({
+        db: MongoDBManager.DB,
+        folders: mFoldersList,
+      });
 
-    return await FolderCollection.RecountFolderSize({
-      db: MongoDBManager.DB,
-      folderId: folderData.parentFolderId,
-      sizeDifference: -folderData.size,
-    });
+      await FileCollection.DeleteFilesByFolders({
+        db: MongoDBManager.DB,
+        folders: mFoldersList,
+      });
+
+      return await FolderCollection.RecountFolderSize({
+        db: MongoDBManager.DB,
+        folderId: folderData.parentFolderId,
+        sizeDifference: -folderData.size,
+      });
+    } else {
+      return {
+        success: false,
+        error: "There is no folder with given data",
+      };
+    }
   }
 
   static async DeleteFile({ fileId }) {

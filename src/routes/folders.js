@@ -9,6 +9,11 @@ router.get("/", async function (req, res, next) {
   res.json(result);
 });
 
+router.get("/all", async function (req, res, next) {
+  const result = await AppDBHelper.GetAllFolderData();
+  res.json(result);
+});
+
 router.post("/create", async function (req, res, next) {
   const data = {
     name: req.body.name,
@@ -24,6 +29,14 @@ router.post("/delete", async function (req, res, next) {
     folderId: req.body.folderId,
   };
   const result = await AppDBHelper.DeleteFolder(data);
+  res.json(result);
+});
+
+router.get("/size", async function (req, res, next) {
+  const data = {
+    folderId: req.body.folderId,
+  };
+  const result = await AppDBHelper.GetTotalSizeOfFolder(data);
   res.json(result);
 });
 

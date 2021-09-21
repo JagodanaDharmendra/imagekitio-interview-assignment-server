@@ -139,13 +139,15 @@ class FileCollection {
     try {
       if (db) {
         const nameQuery = {
-          name: { $regex: fileName != null ? fileName : "//" },
+          name: { $regex: fileName ?? `.*`},
         };
 
         const typeQuery = {
-          type: { $regex: fileType != null ? fileType : "//" },
+          type: { $regex: fileType ?? `.*` },
         };
 
+        console.log(nameQuery);
+        console.log(typeQuery);
         const result = await db
           .collection(FileCollection.COLLECTION_NAME)
           .find({
