@@ -1,0 +1,108 @@
+# a. Insert a new folder or file at any level (root or inside a folder)
+
+### Create Folder
+POST https://server-imagekitio-interview.herokuapp.com/folders/create HTTP/1.1
+content-type: application/json
+
+{
+   "name": "Folder_0001",
+   "path" :"Folder_000...",
+   "parentFolderId"  : "Folder_1"
+}
+
+### Create File
+
+POST https://server-imagekitio-interview.herokuapp.com/files/create HTTP/1.1
+content-type: application/json
+
+{
+    "name": "File_new_001",
+    "size": 100,
+    "dim": 
+    { 
+        "h": 0,
+        "w": 0 
+    },
+    "type": "JPG",
+    "src": "URL",
+    "parentFolderId": "Folder_0"
+}
+
+# b. Get list of all files reverse sorted by date
+
+### Get All Files Data in reverse order
+GET https://server-imagekitio-interview.herokuapp.com/files HTTP/1.1
+content-type: application/json
+
+{
+    "folderId": null,
+    "reverse"  : true
+}
+
+### Get All Files Data in order(normal or reverse) in given folder
+GET https://server-imagekitio-interview.herokuapp.com/files HTTP/1.1
+content-type: application/json
+
+{
+    "folderId": "Folder_0",
+    "reverse"  : true
+}
+
+# c. Find the total size of a folder (like total size of files contained in Folder2 which would include size of files File3.jpg and File4.txt)
+
+### Get Folder total Size By folderId
+GET https://server-imagekitio-interview.herokuapp.com/folders/size HTTP/1.1
+content-type: application/json
+
+{
+   "folderId": "Folder_49"
+}
+
+# d. Delete a folder
+
+### Delete Folder By folderId
+POST https://server-imagekitio-interview.herokuapp.com/folders/delete HTTP/1.1
+content-type: application/json
+
+{
+   "folderId": "Folder_1"
+}
+
+# e. Search by filename
+
+### Search By fileName or fileType
+# fileName IN => "File_001" , "File_0" , "File"
+
+GET https://server-imagekitio-interview.herokuapp.com/files/search HTTP/1.1
+content-type: application/json
+
+{
+    "fileName" : "File_2"
+}
+
+
+# f. Search for files with name “File1” and format = PNG
+
+### Search By fileName or fileType
+#  fileName IN => "File_001" , "File_0" , "File"
+#  fileType IN => JPEG, TIFF, PNG, MOV
+
+GET https://server-imagekitio-interview.herokuapp.com/files/search HTTP/1.1
+content-type: application/json
+
+{
+    "fileName" : null,
+    "fileType": "PNG"
+}
+
+# g. Rename SubFolder2 to NestedFolder2
+
+### Rename Folder by folderId
+POST https://server-imagekitio-interview.herokuapp.com/folders/rename HTTP/1.1
+content-type: application/json
+
+{
+   "folderId": "Folder_2",
+   "newName": "newFolder2"
+}
+
